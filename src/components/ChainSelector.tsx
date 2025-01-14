@@ -2,7 +2,8 @@
 import React,{ Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { EChainType, ChainInfo } from '@/types/chains'
+import { EChainType } from '@/constant/enum/chain.types'
+import { ChainInfo } from '@/constant/config/chain.config'
 
 interface ChainSelectorProps {
   onChainChange?: (chain: EChainType) => void;

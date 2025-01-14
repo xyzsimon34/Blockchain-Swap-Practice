@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import ChainSelector from '@/components/ChainSelector'
-import { EChainType, ETronType } from '@/types/chains'
+import { EChainType, ETronType } from '@/constant/enum/chain.types'
 
 export default function Home() {
   // Demonstrate how to handle the chain selection

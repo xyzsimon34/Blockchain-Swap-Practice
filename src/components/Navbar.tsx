@@ -1,77 +1,92 @@
 'use client'
 
 import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+
+import {
+  ArchiveBoxXMarkIcon,
+  ChevronDownIcon,
+  PencilIcon,
+  Square2StackIcon,
+  TrashIcon,
+} from '@heroicons/react/16/solid'
+
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
-  { name: 'About', href: '/about', current: false },
-  { name: 'Project', href: '/projects', current: false },
-  { name: 'Contact', href: '/contact', current: false },
+  { name: 'A', href: '/', current: false },
+  { name: 'B', href: '/', current: false },
+  { name: 'C', href: '/', current: false },
 ]
 
 export default function Navbar() {
   return (
-    <Disclosure as="nav" className="bg-gray-800">
-      {({ open }) => (
-        <>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between">
-              <div className="flex items-center">
-                <div className="text-white text-xl font-bold">My Project</div>
-                <div className="hidden md:block">
-                  <div className="ml-10 flex items-baseline space-x-4">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={`${
-                          item.current
-                            ? 'bg-gray-900 text-white'
-                            : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                        } rounded-md px-3 py-2 text-sm font-medium`}
-                      >
-                        {item.name}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="md:hidden">
-                <Disclosure.Button className="text-gray-400 hover:text-white">
-                  <span className="sr-only">Open Menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
-              </div>
-            </div>
+    <Menu as="nav" className="bg-gray-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center">
+            <div className="text-white text-xl font-bold">Test</div>
           </div>
 
-          <Disclosure.Panel className="md:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2">
+          <div className="flex items-center">
+            <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-600">
+              Menu
+              <ChevronDownIcon className="size-4 fill-white/60" />
+            </MenuButton>
+
+            <MenuItems className="absolute right-4 top-16 w-52 origin-top-right rounded-xl border border-white/5 bg-gray-700 p-1 text-sm/6 text-white shadow-lg focus:outline-none">
+              {/* Navigation Links */}
               {navigation.map((item) => (
-                <Disclosure.Button
-                  key={item.name}
-                  as="a"
-                  href={item.href}
-                  className={`${
-                    item.current
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                  } block rounded-md px-3 py-2 text-base font-medium`}
-                >
-                  {item.name}
-                </Disclosure.Button>
+                <MenuItem key={item.name}>
+                  <a
+                    href={item.href}
+                    className={`group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 hover:bg-gray-600 ${
+                      item.current ? 'bg-gray-600' : ''
+                    }`}
+                  >
+                    {item.name}
+                  </a>
+                </MenuItem>
               ))}
-            </div>
-          </Disclosure.Panel>
-        </>
-      )}
-    </Disclosure>
+
+               {/* Divider */}
+               <div className="my-1 h-px bg-white/5" />
+              
+              {/* Additional Menu Items */}
+              <MenuItem>
+                <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 hover:bg-gray-600">
+                  <PencilIcon className="size-4 fill-white/30" />
+                  Edit
+                  <kbd className="ml-auto hidden font-sans text-xs text-white/50 group-hover:inline">⌘E</kbd>
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 hover:bg-gray-600">
+                  <Square2StackIcon className="size-4 fill-white/30" />
+                  Duplicate
+                  <kbd className="ml-auto hidden font-sans text-xs text-white/50 group-hover:inline">⌘D</kbd>
+                </button>
+              </MenuItem>
+              <div className="my-1 h-px bg-white/5" />
+              <MenuItem>
+                <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 hover:bg-gray-600">
+                  <ArchiveBoxXMarkIcon className="size-4 fill-white/30" />
+                  Archive
+                  <kbd className="ml-auto hidden font-sans text-xs text-white/50 group-hover:inline">⌘A</kbd>
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 hover:bg-gray-600">
+                  <TrashIcon className="size-4 fill-white/30" />
+                  Delete
+                  <kbd className="ml-auto hidden font-sans text-xs text-white/50 group-hover:inline">⌘D</kbd>
+                </button>
+              </MenuItem>
+            </MenuItems>
+          </div>
+        </div>
+        </div>
+    </Menu>
   )
 }
