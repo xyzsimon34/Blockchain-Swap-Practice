@@ -1,5 +1,6 @@
 'use client'
 import React,{ Fragment, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { EChainType } from '@/constant/enum/chain.types'
@@ -10,6 +11,7 @@ interface ChainSelectorProps {
 }
 
 export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
+  const { t } = useTranslation('common')
   const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM)
 
   const handleChainChange = (chain: EChainType) => {
@@ -100,7 +102,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
             rel="noopener noreferrer"
             className="text-indigo-600 hover:text-indigo-800"
           >
-            View blockchain explorer
+            {t('home.viewExplorer')}
           </a>
         </div>
       )}
