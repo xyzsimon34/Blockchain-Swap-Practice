@@ -1,23 +1,23 @@
-'use client'
-import React,{ Fragment, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { EChainType } from '@/constant/enum/chain.types'
-import { ChainInfo } from '@/constant/config/chain.config'
+"use client";
+import React, { Fragment, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { EChainType } from "@/constant/enum/chain.types";
+import { ChainInfo } from "@/constant/config/chain.config";
 
 interface ChainSelectorProps {
   onChainChange?: (chain: EChainType) => void;
 }
 
 export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
-  const { t } = useTranslation('common')
-  const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM)
+  const { t } = useTranslation("common");
+  const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM);
 
   const handleChainChange = (chain: EChainType) => {
-    setSelectedChain(chain)
-    onChainChange?.(chain)
-  }
+    setSelectedChain(chain);
+    onChainChange?.(chain);
+  };
 
   return (
     <div className="w-72">
@@ -27,9 +27,11 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
             <span className="flex items-center">
               {/* 使用動態 Icon 組件 */}
               {React.createElement(ChainInfo[selectedChain].icon, {
-                className: "h-6 w-6 mr-2 text-gray-600"
+                className: "h-6 w-6 mr-2 text-gray-600",
               })}
-              <span className="block truncate">{ChainInfo[selectedChain].name}</span>
+              <span className="block truncate">
+                {ChainInfo[selectedChain].name}
+              </span>
               <span className="ml-2 text-sm text-gray-500">
                 ({ChainInfo[selectedChain].symbol})
               </span>
@@ -41,7 +43,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
               />
             </span>
           </Listbox.Button>
-          
+
           <Transition
             as={Fragment}
             leave="transition ease-in duration-100"
@@ -54,7 +56,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
                   key={value}
                   className={({ active }) =>
                     `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
-                      active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'
+                      active ? "bg-indigo-100 text-indigo-900" : "text-gray-900"
                     }`
                   }
                   value={value}
@@ -63,9 +65,15 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
                     <>
                       <span className="flex items-center">
                         {React.createElement(ChainInfo[value].icon, {
-                          className: `h-6 w-6 mr-2 ${active ? 'text-indigo-600' : 'text-gray-600'}`
+                          className: `h-6 w-6 mr-2 ${
+                            active ? "text-indigo-600" : "text-gray-600"
+                          }`,
                         })}
-                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                        <span
+                          className={`block truncate ${
+                            selected ? "font-medium" : "font-normal"
+                          }`}
+                        >
                           {ChainInfo[value].name}
                         </span>
                         <span className="ml-2 text-sm text-gray-500">
@@ -77,7 +85,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
                         </span>
                       ) : null}
-                      
+
                       {/* 可選：顯示 Chain ID */}
                       {ChainInfo[value].chainId && (
                         <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-xs text-gray-400">
@@ -92,20 +100,20 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
           </Transition>
         </div>
       </Listbox>
-      
+
       {/* Optional: Display additional information about the currently selected chain */}
       {ChainInfo[selectedChain].explorerUrl && (
         <div className="mt-2 text-sm text-gray-500">
-          <a 
+          <a
             href={ChainInfo[selectedChain].explorerUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-indigo-600 hover:text-indigo-800"
           >
-            {t('home.viewExplorer')}
+            {t("home.viewExplorer")}
           </a>
         </div>
       )}
     </div>
-  )
+  );
 }
