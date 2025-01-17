@@ -1,39 +1,87 @@
 "use client";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Listbox, Transition } from "@headlessui/react";
+import {
+  Listbox,
+  ListboxOptions,
+  ListboxOption,
+  ListboxButton,
+  Transition,
+} from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { EChainType } from "@/constant/enum/chain.types";
-import { ChainInfo } from "@/constant/config/chain.config";
+import { getChains } from "@/utils/api/chain";
+import { useQuery } from "@tanstack/react-query";
+import { SiEthereum, SiBinance, SiPolygon } from "react-icons/si";
+import { TbBrandTorchain } from "react-icons/tb";
+import { IconType } from "react-icons";
 
+// Define the chain selector props
 interface ChainSelectorProps {
   onChainChange?: (chain: EChainType) => void;
 }
 
-export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
-  const { t } = useTranslation("common");
-  const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM);
+// Define the chain data structure
+interface ChainData {
+  chainType: EChainType;
+  name: string;
+  currencySymbol?: string;
+  chainId: string;
+  blockExplorerUrl?: string;
+  rpcUrl?: string;
+}
 
-  const handleChainChange = (chain: EChainType) => {
-    setSelectedChain(chain);
-    onChainChange?.(chain);
-  };
+// Define the icons for each chain
+const chainIcons: Record<EChainType, IconType> = {
+  [EChainType.ETHEREUM]: SiEthereum,
+  [EChainType.BINANCE]: SiBinance,
+  [EChainType.TRON]: TbBrandTorchain,
+  [EChainType.POLYGON]: SiPolygon,
+  [EChainType.POLYGON_ZKEVM]: SiPolygon,
+};
+
+interface ChainSelectorContentProps {
+  selectedChain: EChainType;
+  handleChainChange: (chain: EChainType) => void;
+  chains: ChainData[];
+  t: (key: string) => string;
+}
+
+function ChainSelectorContent({
+  selectedChain,
+  handleChainChange,
+  chains,
+  t,
+}: ChainSelectorContentProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const selectedChainData = chains.find(
+    (chain) => chain.chainType === selectedChain
+  );
+
+  useEffect(() => {
+    console.log("Selected Chain:", selectedChain);
+    console.log("Selected Chain Data:", selectedChainData);
+    console.log("Explorer URL:", selectedChainData?.blockExplorerUrl);
+    console.log("Is Client:", isClient);
+  }, [selectedChain, selectedChainData, isClient]);
 
   return (
     <div className="w-72">
       <Listbox value={selectedChain} onChange={handleChainChange}>
         <div className="relative mt-1">
-          <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-10 text-left border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300">
+          <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-10 text-left border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300">
             <span className="flex items-center">
-              {/* 使用動態 Icon 組件 */}
-              {React.createElement(ChainInfo[selectedChain].icon, {
+              {React.createElement(chainIcons[selectedChain], {
                 className: "h-6 w-6 mr-2 text-gray-600",
               })}
-              <span className="block truncate">
-                {ChainInfo[selectedChain].name}
-              </span>
+              <span className="block truncate">{selectedChainData?.name}</span>
               <span className="ml-2 text-sm text-gray-500">
-                ({ChainInfo[selectedChain].symbol})
+                ({selectedChainData?.currencySymbol})
               </span>
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -42,7 +90,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
                 aria-hidden="true"
               />
             </span>
-          </Listbox.Button>
+          </ListboxButton>
 
           <Transition
             as={Fragment}
@@ -50,21 +98,21 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none z-10">
-              {Object.entries(EChainType).map(([key, value]) => (
-                <Listbox.Option
-                  key={value}
+            <ListboxOptions className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none z-10">
+              {chains.map((chain) => (
+                <ListboxOption
+                  key={chain.chainType}
                   className={({ active }) =>
                     `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
                       active ? "bg-indigo-100 text-indigo-900" : "text-gray-900"
                     }`
                   }
-                  value={value}
+                  value={chain.chainType}
                 >
                   {({ selected, active }) => (
                     <>
                       <span className="flex items-center">
-                        {React.createElement(ChainInfo[value].icon, {
+                        {React.createElement(chainIcons[chain.chainType], {
                           className: `h-6 w-6 mr-2 ${
                             active ? "text-indigo-600" : "text-gray-600"
                           }`,
@@ -74,10 +122,10 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
                             selected ? "font-medium" : "font-normal"
                           }`}
                         >
-                          {ChainInfo[value].name}
+                          {chain.name}
                         </span>
                         <span className="ml-2 text-sm text-gray-500">
-                          ({ChainInfo[value].symbol})
+                          ({chain.currencySymbol})
                         </span>
                       </span>
                       {selected ? (
@@ -86,26 +134,24 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
                         </span>
                       ) : null}
 
-                      {/* 可選：顯示 Chain ID */}
-                      {ChainInfo[value].chainId && (
+                      {chain.chainId && (
                         <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-xs text-gray-400">
-                          Chain ID: {ChainInfo[value].chainId}
+                          Chain ID: {chain.chainId}
                         </span>
                       )}
                     </>
                   )}
-                </Listbox.Option>
+                </ListboxOption>
               ))}
-            </Listbox.Options>
+            </ListboxOptions>
           </Transition>
         </div>
       </Listbox>
 
-      {/* Optional: Display additional information about the currently selected chain */}
-      {ChainInfo[selectedChain].explorerUrl && (
+      {isClient && selectedChainData && selectedChainData.blockExplorerUrl && (
         <div className="mt-2 text-sm text-gray-500">
           <a
-            href={ChainInfo[selectedChain].explorerUrl}
+            href={selectedChainData.blockExplorerUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-indigo-600 hover:text-indigo-800"
@@ -115,5 +161,65 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
+  const { t } = useTranslation("common");
+  const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM);
+
+  const {
+    data: chainsResponse,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["chains"],
+    queryFn: getChains,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  });
+
+  const chains = Array.isArray(chainsResponse)
+    ? chainsResponse.map((chain) => ({
+        ...chain,
+        chainType: chain.chainType as EChainType,
+      }))
+    : [];
+
+  useEffect(() => {
+    if (chainsResponse) {
+      console.log("API Response:", chainsResponse);
+      console.log("Processed Chains:", chains);
+    }
+  }, [chainsResponse]);
+
+  const handleChainChange = (chain: EChainType) => {
+    setSelectedChain(chain);
+    onChainChange?.(chain);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="w-72">
+        <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    console.error("Failed to load chains:", error);
+    return null;
+  }
+
+  return (
+    <ChainSelectorContent
+      selectedChain={selectedChain}
+      handleChainChange={handleChainChange}
+      chains={chains}
+      t={t}
+    />
   );
 }
