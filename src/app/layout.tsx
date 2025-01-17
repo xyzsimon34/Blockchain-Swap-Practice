@@ -1,14 +1,9 @@
-import '@/i18n';
-import type { Metadata } from "next";
-import  { Inter } from "next/font/google";
-import "./globals.css"
+import "@/i18n";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import ClientProviders from "@/components/providers/ClientProviders";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "My Project",
-  description: "My project description",
-};
 
 export default function RootLayout({
   children,
@@ -17,7 +12,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <ClientProviders>{children}</ClientProviders>
+      </body>
     </html>
   );
 }
