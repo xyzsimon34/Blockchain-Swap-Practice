@@ -1,5 +1,5 @@
 "use client";
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Listbox,
@@ -10,11 +10,15 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { EChainType } from "@/constant/enum/chain.types";
-import { getChains } from "@/utils/api/chain";
+import { useChainApi } from "@/contexts/api/ChainApiContext";
 import { useQuery } from "@tanstack/react-query";
 import { SiEthereum, SiBinance, SiPolygon } from "react-icons/si";
 import { TbBrandTorchain } from "react-icons/tb";
 import { IconType } from "react-icons";
+import {
+  ChainApiResponse,
+  IChainResponse,
+} from "@/contexts/api/ChainApiContext";
 
 // Define the chain selector props
 interface ChainSelectorProps {
@@ -25,10 +29,10 @@ interface ChainSelectorProps {
 interface ChainData {
   chainType: EChainType;
   name: string;
-  currencySymbol?: string;
+  currencySymbol: string;
   chainId: string;
-  blockExplorerUrl?: string;
-  rpcUrl?: string;
+  blockExplorerUrl: string;
+  rpcUrl: string;
 }
 
 // Define the icons for each chain
@@ -54,6 +58,7 @@ function ChainSelectorContent({
   t,
 }: ChainSelectorContentProps) {
   const [isClient, setIsClient] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // 添加狀態控制下拉選單
 
   useEffect(() => {
     setIsClient(true);
@@ -72,9 +77,16 @@ function ChainSelectorContent({
 
   return (
     <div className="w-72">
-      <Listbox value={selectedChain} onChange={handleChainChange}>
-        <div className="relative mt-1">
-          <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-10 text-left border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300">
+      <Listbox
+        value={selectedChain}
+        onChange={(value) => {
+          handleChainChange(value);
+          setIsOpen(false); // 選擇後關閉下拉選單
+        }}
+      >
+        {" "}
+        <div className="relative mt-1 ">
+          <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-10 text-left border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 shadow-sm">
             <span className="flex items-center">
               {React.createElement(chainIcons[selectedChain], {
                 className: "h-6 w-6 mr-2 text-gray-600",
@@ -98,12 +110,16 @@ function ChainSelectorContent({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <ListboxOptions className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none z-10">
+            <ListboxOptions
+              static
+              className="absolute z-[100] w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none"
+            >
+              {" "}
               {chains.map((chain) => (
                 <ListboxOption
                   key={chain.chainType}
                   className={({ active }) =>
-                    `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
+                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
                       active ? "bg-indigo-100 text-indigo-900" : "text-gray-900"
                     }`
                   }
@@ -133,7 +149,6 @@ function ChainSelectorContent({
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
                         </span>
                       ) : null}
-
                       {chain.chainId && (
                         <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-xs text-gray-400">
                           Chain ID: {chain.chainId}
@@ -148,7 +163,7 @@ function ChainSelectorContent({
         </div>
       </Listbox>
 
-      {isClient && selectedChainData && selectedChainData.blockExplorerUrl && (
+      {isClient && selectedChainData?.blockExplorerUrl && (
         <div className="mt-2 text-sm text-gray-500">
           <a
             href={selectedChainData.blockExplorerUrl}
@@ -166,13 +181,14 @@ function ChainSelectorContent({
 
 export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
   const { t } = useTranslation("common");
+  const { getChains } = useChainApi();
   const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM);
 
   const {
     data: chainsResponse,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<ChainApiResponse>({
     queryKey: ["chains"],
     queryFn: getChains,
     staleTime: 5 * 60 * 1000,
@@ -182,19 +198,29 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
     refetchOnReconnect: false,
   });
 
-  const chains = Array.isArray(chainsResponse)
-    ? chainsResponse.map((chain) => ({
-        ...chain,
-        chainType: chain.chainType as EChainType,
-      }))
-    : [];
+  const chains = useMemo(() => {
+    if (!chainsResponse?.data?.data) return [];
+
+    const allChains = Object.values(chainsResponse.data.data).map(
+      (chainData: IChainResponse) => ({
+        chainType: chainData.chainType as EChainType,
+        name: chainData.name,
+        currencySymbol: chainData.symbol,
+        chainId: chainData.chainId,
+        blockExplorerUrl: chainData.blockExplorerUrl,
+        rpcUrl: chainData.rpcUrl,
+      })
+    );
+    console.log("Available Chains:", allChains);
+    return allChains;
+  }, [chainsResponse]);
 
   useEffect(() => {
     if (chainsResponse) {
-      console.log("API Response:", chainsResponse);
+      console.log("Raw API Response:", chainsResponse);
       console.log("Processed Chains:", chains);
     }
-  }, [chainsResponse]);
+  }, [chainsResponse, chains]);
 
   const handleChainChange = (chain: EChainType) => {
     setSelectedChain(chain);

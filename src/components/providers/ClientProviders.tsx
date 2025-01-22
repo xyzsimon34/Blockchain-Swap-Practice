@@ -1,39 +1,46 @@
 "use client";
 
+import { ReactNode, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import I18nProvider from "@/components/i18nProvider";
+import { ApiProvider } from "@/contexts/api/ApiContext";
+import { ChainApiProvider } from "@/contexts/api/ChainApiContext";
+import { I18nProvider } from "@/contexts/i18nContext";
+import { ErrorBoundary } from "react-error-boundary";
 
-export default function ClientProviders({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [mounted, setMounted] = useState(false);
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 5 * 60 * 1000,
-            gcTime: 30 * 60 * 1000,
-            retry: 2,
-          },
-        },
-      })
-  );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
+function ErrorFallback({ error }: { error: Error }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <I18nProvider>{children}</I18nProvider>
-    </QueryClientProvider>
+    <div className="text-red-500">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+    </div>
+  );
+}
+
+function LoadingFallback() {
+  return <div className="animate-pulse">Loading...</div>;
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+export default function ClientProviders({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <QueryClientProvider client={queryClient}>
+        <ApiProvider>
+          <ChainApiProvider>
+            <I18nProvider>
+              <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
+            </I18nProvider>
+          </ChainApiProvider>
+        </ApiProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
