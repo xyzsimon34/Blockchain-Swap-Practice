@@ -85,7 +85,7 @@ const ChainApiContext = createContext<ChainApiContextType | null>(null);
 
 // Helper Functions
 const createFallbackResponse = (errorMessage: string): ChainApiResponse => {
-  console.log("創建備用響應...");
+  console.log("[Fallback] Creating fallback response...");
 
   const chainData = fallbackChains.reduce((acc, chain) => {
     acc[chain.chainType] = {
@@ -96,17 +96,20 @@ const createFallbackResponse = (errorMessage: string): ChainApiResponse => {
       blockExplorerUrl: chain.blockExplorerUrl,
       rpcUrl: chain.rpcUrl,
     };
-    console.log(`創建 ${chain.chainType} 的備用數據:`, acc[chain.chainType]);
+    console.log(
+      `[Fallback] Created data for ${chain.chainType}:`,
+      acc[chain.chainType]
+    );
     return acc;
   }, {} as Record<string, IChainResponse>);
 
   const response = {
     status: 200,
-    message: `使用備用數據 (原因: ${errorMessage})`,
+    message: `Using fallback data (Reason: ${errorMessage})`,
     data: chainData,
   };
 
-  console.log("最終備用響應:", response);
+  console.log("[Fallback] Final fallback response:", response);
   return response;
 };
 
@@ -115,6 +118,7 @@ function ChainApiProvider({ children }: ChainApiProviderProps) {
   const { axiosRequest } = useApi();
 
   const getChains = async (): Promise<ChainApiResponse> => {
+    console.log("[API] Fetching chains from API...");
     try {
       const apiResponse = await axiosRequest<Record<string, IChainResponse>>({
         method: "GET",
@@ -122,16 +126,24 @@ function ChainApiProvider({ children }: ChainApiProviderProps) {
         timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 30000,
       });
 
+      console.log("[API] Received API response:", apiResponse);
+
       if (!apiResponse?.data || Object.keys(apiResponse.data).length === 0) {
-        throw new Error("API 返回空數據");
+        console.warn("[API] API returned empty data. Using fallback...");
+        toast.warning("API returned empty data");
       }
 
+      console.log("[API] Successfully fetched chains from API.");
       return apiResponse;
     } catch (error) {
-      console.warn("API 請求失敗，使用備用數據:", error);
-      return createFallbackResponse("API 不可用或出錯");
+      toast.warning("[API] API request failed. Using fallback data:");
+      return createFallbackResponse("API unavailable or error occurred");
     }
   };
+
+  {
+    console.log("[Provider] Rendering ChainApiProvider...");
+  }
 
   return (
     <ChainApiContext.Provider value={{ getChains }}>
@@ -142,10 +154,13 @@ function ChainApiProvider({ children }: ChainApiProviderProps) {
 
 // Hook
 function useChainApi(): ChainApiContextType {
+  console.log("[Hook] Using ChainApiContext...");
   const context = useContext(ChainApiContext);
   if (!context) {
+    toast.warning("[Hook] ChainApiContext is not available!");
     throw new Error("useChainApi must be used within ChainApiProvider");
   }
+  console.log("[Hook] Successfully retrieved ChainApiContext.");
   return context;
 }
 

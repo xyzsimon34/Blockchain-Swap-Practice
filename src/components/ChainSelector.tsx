@@ -74,6 +74,18 @@ function ChainSelectorContent({
 
   return (
     <div className="w-73 h-80">
+      {/* 添加測試按鈕 */}
+      <button
+        onClick={() => {
+          toast.success("成功提示測試");
+          toast.error("錯誤提示測試");
+          toast.warning("警告提示測試");
+          toast.info("信息提示測試");
+        }}
+        className="mb-2 px-4 py-2 bg-purple-800 rounded-lg text-sm"
+      >
+        測試 Toast
+      </button>
       <Listbox
         value={selectedChain}
         onChange={(value) => {
@@ -84,7 +96,7 @@ function ChainSelectorContent({
         <div className="relative mt-1">
           <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-10 text-left border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 shadow-sm">
             <span className="flex items-center">
-              {React.createElement(chainIcons[selectedChain], {
+              {React.createElement(chainIcons[selectedChain] || SiEthereum, {
                 className: "h-6 w-6 mr-2 text-gray-600",
               })}
               <span className="block truncate">{selectedChainData?.name}</span>
@@ -120,11 +132,14 @@ function ChainSelectorContent({
                   {({ selected, active }) => (
                     <>
                       <span className="flex items-center">
-                        {React.createElement(chainIcons[chain.chainType], {
-                          className: `h-6 w-6 mr-2 ${
-                            active ? "text-indigo-600" : "text-gray-600"
-                          }`,
-                        })}
+                        {React.createElement(
+                          chainIcons[chain.chainType] || SiEthereum,
+                          {
+                            className: `h-6 w-6 mr-2 ${
+                              active ? "text-indigo-600" : "text-gray-600"
+                            }`,
+                          }
+                        )}
                         <span
                           className={`block truncate ${
                             selected ? "font-medium" : "font-normal"
@@ -175,7 +190,9 @@ function ChainSelectorContent({
 export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
   const { t } = useTranslation("common");
   const { getChains } = useChainApi();
-  const [selectedChain, setSelectedChain] = useState(EChainType.ETHEREUM);
+  const [selectedChain, setSelectedChain] = useState<EChainType>(
+    EChainType.ETHEREUM
+  );
 
   const {
     data: chainsResponse,
@@ -215,8 +232,9 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
   }
 
   if (error) {
-    toast.error("Failed to load chains:");
-    return fallbackChains;
+    console.error("Error fetching chains:", error);
+    toast.error(`Failed to load chains: ${error.message || "Unknown error"}`);
+    return <div>Error loading chains. Please try again.</div>;
   }
 
   return (
