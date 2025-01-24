@@ -1,0 +1,24 @@
+{
+  "home": {
+    "title": "Choose your network",
+    "viewExplorer": "View blockchain explorer",
+    "chainSelect": {
+      "tronMainnet": "Tron Mainnet Chain ID"
+    }
+  },
+  "navbar": {
+    "brand": "Test",
+    "menu": {
+      "title": "Menu",
+      "home": "Home",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "archive": "Archive",
+      "delete": "Delete"
+    }
+  },
+  "language": {
+    "en": "English",
+    "zh-TW": "繁體中文"
+  }
+}

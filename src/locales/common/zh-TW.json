@@ -1,0 +1,24 @@
+{
+  "home": {
+    "title": "選擇你的網路",
+    "viewExplorer": "查看區塊鏈瀏覽器",
+    "chainSelect": {
+      "tronMainnet": "波場主網 Chain ID"
+    }
+  },
+  "navbar": {
+    "brand": "測試",
+    "menu": {
+      "title": "選單",
+      "home": "首頁",
+      "edit": "編輯",
+      "duplicate": "複製",
+      "archive": "封存",
+      "delete": "刪除"
+    }
+  },
+  "language": {
+    "en": "English",
+    "zh-TW": "繁體中文"
+  }
+}
