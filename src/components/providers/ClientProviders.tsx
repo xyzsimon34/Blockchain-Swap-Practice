@@ -7,8 +7,10 @@ import { ChainApiProvider } from "@/contexts/api/ChainApiContext";
 import { I18nProvider } from "@/contexts/i18nContext";
 import { ErrorBoundary } from "react-error-boundary";
 import { ToastContainer } from "react-toastify";
+import { WalletProvider } from "./WalletProvider";
 import "react-toastify/dist/ReactToastify.css";
 
+// Error Boundary (displayed when the application encounters an error)
 function ErrorFallback({ error }: { error: Error }) {
   return (
     <div className="text-red-500">
@@ -18,10 +20,12 @@ function ErrorFallback({ error }: { error: Error }) {
   );
 }
 
+// Loading Placeholder (to avoid white screen)
 function LoadingFallback() {
   return <div className="animate-pulse">Loading...</div>;
 }
 
+// React Query Configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -31,27 +35,31 @@ const queryClient = new QueryClient({
   },
 });
 
+// 🚀 **Integrate All Providers**
 export default function ClientProviders({ children }: { children: ReactNode }) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <QueryClientProvider client={queryClient}>
         <ApiProvider>
           <ChainApiProvider>
-            <I18nProvider>
-              <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
-              <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="dark"
-              />
-            </I18nProvider>
+            <WalletProvider>
+              <I18nProvider>
+                <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
+                {/* Toast Notifications */}
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="dark"
+                />
+              </I18nProvider>
+            </WalletProvider>
           </ChainApiProvider>
         </ApiProvider>
       </QueryClientProvider>

@@ -74,17 +74,17 @@ function ChainSelectorContent({
 
   return (
     <div className="w-73 h-80">
-      {/* 添加測試按鈕 */}
+      {/* Add test button */}
       <button
         onClick={() => {
-          toast.success("成功提示測試");
-          toast.error("錯誤提示測試");
-          toast.warning("警告提示測試");
-          toast.info("信息提示測試");
+          toast.success("Success message test");
+          toast.error("Error message test");
+          toast.warning("Warning message test");
+          toast.info("Info message test");
         }}
         className="mb-2 px-4 py-2 bg-purple-800 rounded-lg text-sm"
       >
-        測試 Toast
+        Test Toast
       </button>
       <Listbox
         value={selectedChain}
