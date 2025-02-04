@@ -74,18 +74,6 @@ function ChainSelectorContent({
 
   return (
     <div className="w-73 h-80">
-      {/* Add test button */}
-      <button
-        onClick={() => {
-          toast.success("Success message test");
-          toast.error("Error message test");
-          toast.warning("Warning message test");
-          toast.info("Info message test");
-        }}
-        className="mb-2 px-4 py-2 bg-purple-800 rounded-lg text-sm"
-      >
-        Test Toast
-      </button>
       <Listbox
         value={selectedChain}
         onChange={(value) => {

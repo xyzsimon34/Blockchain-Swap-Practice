@@ -73,8 +73,11 @@ function HomeContent() {
                 {t("home.title")}
               </h1>
 
-              <div className="rounded-full bg-purple-600 px-4 py-1 text-sm font-medium text-white">
-                Testnet
+              <div className="flex items-center gap-4">
+                <div className="rounded-full bg-purple-600 px-4 py-1 text-sm font-medium text-white">
+                  Testnet
+                </div>
+                <WalletConnect />
               </div>
             </div>
 
@@ -82,10 +85,6 @@ function HomeContent() {
               <div className="space-y-2">
                 {/* ✅ Chain Selector */}
                 <ChainSelector onChainChange={handleChainSelect} />
-              </div>
-              {/* ✅ Add WalletConnect button */}
-              <div className="my-4">
-                <WalletConnect />
               </div>
             </div>
           </div>
