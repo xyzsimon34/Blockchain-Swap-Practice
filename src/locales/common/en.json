@@ -20,5 +20,37 @@
   "language": {
     "en": "English",
     "zh-TW": "繁體中文"
+  },
+  "swap": {
+    "title": "Cross-Chain Swap",
+    "fromChain": "From Chain",
+    "toChain": "To Chain",
+    "from": "From",
+    "to": "To",
+    "settings": "Settings",
+    "slippage": "Slippage Tolerance (%)",
+    "deadline": "Transaction Deadline (minutes)",
+    "swapButton": "Swap",
+    "confirmTitle": "Confirm Swap",
+    "exchangeRate": "Exchange Rate",
+    "priceImpact": "Price Impact",
+    "networkFee": "Network Fee",
+    "minimumReceived": "Minimum Received",
+    "confirming": "Confirming...",
+    "confirmButton": "Confirm Swap",
+    "cancelButton": "Cancel"
+  },
+  "token": {
+    "select": "Select Token",
+    "search": "Search tokens",
+    "balance": "Balance",
+    "max": "MAX"
+  },
+  "chain": {
+    "ethereum": "Ethereum",
+    "binance": "Binance Smart Chain",
+    "tron": "TRON",
+    "polygon": "Polygon",
+    "polygon_zkevm": "Polygon zkEVM"
   }
 }

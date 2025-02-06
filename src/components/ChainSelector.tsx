@@ -27,6 +27,9 @@ import { toast } from "react-toastify";
 // Types
 interface ChainSelectorProps {
   onChainChange?: (chain: EChainType) => void;
+  value?: EChainType; // 新增
+  onChange?: (chain: EChainType) => void; // 新增
+  className?: string;
 }
 
 interface ChainData {
@@ -175,7 +178,11 @@ function ChainSelectorContent({
 }
 
 // Main Component
-export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
+export default function ChainSelector({
+  onChainChange,
+  value,
+  onChange,
+}: ChainSelectorProps) {
   const { t } = useTranslation("common");
   const { getChains } = useChainApi();
   const [selectedChain, setSelectedChain] = useState<EChainType>(
@@ -209,6 +216,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
   const handleChainChange = (chain: EChainType) => {
     setSelectedChain(chain);
     onChainChange?.(chain);
+    onChange?.(chain);
   };
 
   if (isLoading) {
@@ -221,7 +229,7 @@ export default function ChainSelector({ onChainChange }: ChainSelectorProps) {
 
   if (error) {
     console.error("Error fetching chains:", error);
-    toast.error(`Failed to load chains: ${error.message || "Unknown error"}`);
+    toast.error(`Failed to load chains"}`);
     return <div>Error loading chains. Please try again.</div>;
   }
 

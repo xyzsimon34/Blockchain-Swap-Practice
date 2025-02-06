@@ -1,10 +1,10 @@
 "use client";
+
 import { useTranslation } from "react-i18next";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import ChainSelector from "@/components/ChainSelector";
 import { WalletConnect } from "@/components/WalletConnect";
-import { EChainType, ETronType } from "@/constant/enum/chain.types";
+import SwapContainer from "@/components/swap/SwapContainer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create QueryClient
@@ -19,7 +19,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// **Main Page Content**
 function HomeContent() {
   const { t } = useTranslation("common");
   const [mounted, setMounted] = useState(false);
@@ -28,16 +27,6 @@ function HomeContent() {
     setMounted(true);
     return () => setMounted(false);
   }, []);
-
-  // **Callback when selecting a chain**
-  const handleChainSelect = useCallback(
-    (chain: EChainType) => {
-      if (chain === EChainType.TRON) {
-        console.log(`${t("home.chainSelect.tronMainnet")}:`, ETronType.Mainnet);
-      }
-    },
-    [t]
-  );
 
   if (!mounted) {
     return (
@@ -81,12 +70,8 @@ function HomeContent() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                {/* ✅ Chain Selector */}
-                <ChainSelector onChainChange={handleChainSelect} />
-              </div>
-            </div>
+            {/* Swap Container */}
+            <SwapContainer className="text-white" />
           </div>
         </div>
       </div>
@@ -94,7 +79,6 @@ function HomeContent() {
   );
 }
 
-// **Main Page Component**
 export default function Home() {
   return (
     <QueryClientProvider client={queryClient}>
