@@ -20,5 +20,37 @@
   "language": {
     "en": "English",
     "zh-TW": "繁體中文"
+  },
+  "swap": {
+    "title": "跨鏈交換",
+    "fromChain": "從",
+    "toChain": "到",
+    "from": "從",
+    "to": "到",
+    "settings": "設定",
+    "slippage": "滑點容許度 (%)",
+    "deadline": "交易期限 (分鐘)",
+    "swapButton": "交換",
+    "confirmTitle": "確認交換",
+    "exchangeRate": "兌換率",
+    "priceImpact": "價格影響",
+    "networkFee": "網路費用",
+    "minimumReceived": "最少收到",
+    "confirming": "確認中...",
+    "confirmButton": "確認交換",
+    "cancelButton": "取消"
+  },
+  "token": {
+    "select": "選擇代幣",
+    "search": "搜尋代幣",
+    "balance": "餘額",
+    "max": "最大"
+  },
+  "chain": {
+    "ethereum": "以太坊",
+    "binance": "幣安智能鏈",
+    "tron": "波場",
+    "polygon": "Polygon",
+    "polygon_zkevm": "Polygon zkEVM"
   }
 }
