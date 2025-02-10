@@ -72,10 +72,8 @@ export default function SwapContainer({ className }: SwapContainerProps) {
   };
 
   return (
-    <div className={`w-full ${className}`}>
-      {/* Main Swap Card */}
+    <div className={`w-full max-w-xl mx-auto ${className}`}>
       <div className="relative overflow-hidden rounded-2xl bg-gray-900/70 backdrop-blur-xl border border-white/10">
-        {/* Glass Effect Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
         {/* Header */}
@@ -101,7 +99,7 @@ export default function SwapContainer({ className }: SwapContainerProps) {
                 <ChainSelector
                   value={sourceChain}
                   onChainChange={setSourceChain}
-                  className="bg-gray-800/50 border-gray-700/50 text-white"
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -109,9 +107,9 @@ export default function SwapContainer({ className }: SwapContainerProps) {
                   {t("swap.toChain")}
                 </label>
                 <ChainSelector
-                  value={sourceChain}
-                  onChainChange={setSourceChain}
-                  className="bg-gray-800/50 border-gray-700/50 text-white"
+                  value={targetChain}
+                  onChainChange={setTargetChain}
+                  className="w-full"
                 />
               </div>
             </div>
@@ -120,31 +118,25 @@ export default function SwapContainer({ className }: SwapContainerProps) {
             <button
               onClick={handleSwapChains}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full
-                bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30
-                transition-all duration-200 hover:scale-110 group"
+                  bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30
+                  transition-all duration-200 hover:scale-110 group"
             >
               <ArrowsUpDownIcon className="h-4 w-4 text-indigo-400 group-hover:text-indigo-300" />
             </button>
           </div>
 
           {/* Swap Form */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl" />
-            <div className="relative backdrop-blur-sm rounded-xl">
-              <SwapForm
-                sourceChain={sourceChain}
-                targetChain={targetChain}
-                onSwapClick={() => setShowConfirmation(true)}
-                onSwapDetailsChange={setSwapDetails}
-                className="text-white"
-              />
-            </div>
-          </div>
+          <SwapForm
+            sourceChain={sourceChain}
+            targetChain={targetChain}
+            onSwapClick={() => setShowConfirmation(true)}
+            onSwapDetailsChange={setSwapDetails}
+          />
 
           {/* Settings Panel */}
           {showSettings && (
             <div className="rounded-xl bg-gray-800/30 backdrop-blur-sm p-4 border border-white/5">
-              <SwapSettings className="text-white" />
+              <SwapSettings />
             </div>
           )}
         </div>

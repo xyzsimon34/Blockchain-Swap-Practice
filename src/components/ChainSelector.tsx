@@ -1,12 +1,12 @@
 "use client";
 
-import React, { Fragment, useState, useEffect, useMemo } from "react";
+import React, { Fragment, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Listbox,
+  ListboxButton,
   ListboxOptions,
   ListboxOption,
-  ListboxButton,
   Transition,
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
@@ -17,8 +17,6 @@ import { TbBrandTorchain } from "react-icons/tb";
 import { IconType } from "react-icons";
 import {
   ChainApiResponse,
-  IChainResponse,
-  fallbackChains,
   useChainApi,
   createFallbackResponse,
 } from "@/contexts/api/ChainApiContext";
@@ -26,10 +24,10 @@ import { toast } from "react-toastify";
 
 // Types
 interface ChainSelectorProps {
-  onChainChange?: (chain: EChainType) => void;
-  value?: EChainType; // 新增
-  onChange?: (chain: EChainType) => void; // 新增
+  value: EChainType;
+  onChainChange: (chain: EChainType) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 interface ChainData {
@@ -41,13 +39,6 @@ interface ChainData {
   rpcUrl: string;
 }
 
-interface ChainSelectorContentProps {
-  selectedChain: EChainType;
-  handleChainChange: (chain: EChainType) => void;
-  chains: ChainData[];
-  t: (key: string) => string;
-}
-
 // Constants
 const chainIcons: Record<EChainType, IconType> = {
   [EChainType.ETHEREUM]: SiEthereum,
@@ -57,66 +48,113 @@ const chainIcons: Record<EChainType, IconType> = {
   [EChainType.POLYGON_ZKEVM]: SiPolygon,
 };
 
-// Components
-function ChainSelectorContent({
-  selectedChain,
-  handleChainChange,
-  chains,
-  t,
-}: ChainSelectorContentProps) {
-  const [isClient, setIsClient] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+export default function ChainSelector({
+  value,
+  onChainChange,
+  className = "",
+  disabled = false,
+}: ChainSelectorProps) {
+  const { t } = useTranslation("common");
+  const { getChains } = useChainApi();
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // 獲取鏈數據
+  const {
+    data: chainsResponse,
+    isLoading,
+    error,
+  } = useQuery<ChainApiResponse>({
+    queryKey: ["chains"],
+    queryFn: getChains,
+    initialData: createFallbackResponse("初始化使用備用數據"),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const selectedChainData = chains.find(
-    (chain) => chain.chainType === selectedChain
-  );
+  // 處理鏈數據
+  const chains = useMemo(() => {
+    if (!chainsResponse.data) return [];
+    return Object.values(chainsResponse.data).map((chainData) => ({
+      chainType: chainData.chainType as EChainType,
+      name: chainData.name,
+      currencySymbol: chainData.currencySymbol,
+      chainId: chainData.chainId,
+      blockExplorerUrl: chainData.blockExplorerUrl,
+      rpcUrl: chainData.rpcUrl,
+    }));
+  }, [chainsResponse.data]);
+
+  // 加載狀態
+  if (isLoading) {
+    return (
+      <div className="w-full">
+        <div className="h-10 bg-gray-800/50 animate-pulse rounded-lg" />
+      </div>
+    );
+  }
+
+  // 錯誤處理
+  if (error) {
+    console.error("Error fetching chains:", error);
+    toast.error(t("errors.chainLoadFailed"));
+    return null;
+  }
+
+  // 獲取當前選中的鏈數據
+  const selectedChain = chains.find((chain) => chain.chainType === value);
 
   return (
-    <div className="w-73 h-80">
-      <Listbox
-        value={selectedChain}
-        onChange={(value) => {
-          handleChainChange(value);
-          setIsOpen(false);
-        }}
-      >
-        <div className="relative mt-1">
-          <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-10 text-left border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 shadow-sm">
+    <div className={className}>
+      <Listbox value={value} onChange={onChainChange} disabled={disabled}>
+        <div className="relative">
+          {/* 選擇器按鈕 */}
+          <ListboxButton
+            className="relative w-full cursor-pointer rounded-xl 
+            bg-gray-800/50 py-3 pl-4 pr-10 group
+            text-left border border-white/10 
+            hover:border-indigo-500/50 hover:bg-gray-800/70
+            focus:outline-none focus-visible:border-indigo-500 
+            focus-visible:ring-2 focus-visible:ring-white/75 
+            transition-all duration-200
+            disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <span className="flex items-center">
-              {React.createElement(chainIcons[selectedChain] || SiEthereum, {
-                className: "h-6 w-6 mr-2 text-gray-600",
+              {React.createElement(chainIcons[value] || SiEthereum, {
+                className:
+                  "h-6 w-6 mr-3 text-white/70 group-hover:text-indigo-400 transition-colors",
               })}
-              <span className="block truncate">{selectedChainData?.name}</span>
-              <span className="ml-2 text-sm text-gray-500">
-                ({selectedChainData?.currencySymbol})
-              </span>
+              <div className="flex flex-col">
+                <span className="block text-white font-medium">
+                  {selectedChain?.name}
+                </span>
+                <span className="text-sm text-white/50">
+                  {selectedChain?.currencySymbol}
+                </span>
+              </div>
             </span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-              <ChevronUpDownIcon
-                className="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
+            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <ChevronUpDownIcon className="h-5 w-5 text-white/50 group-hover:text-indigo-400 transition-colors" />
             </span>
           </ListboxButton>
 
+          {/* 下拉選項 */}
           <Transition
             as={Fragment}
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <ListboxOptions className="absolute z-[100] w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none">
+            <ListboxOptions
+              className="absolute z-[100] w-full mt-2 max-h-60 overflow-auto 
+              rounded-xl bg-gray-900/95 backdrop-blur-sm py-2 
+              text-base shadow-lg ring-1 ring-black/5 focus:outline-none
+              border border-white/10"
+            >
               {chains.map((chain) => (
                 <ListboxOption
                   key={chain.chainType}
                   className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                      active ? "bg-indigo-100 text-indigo-900" : "text-gray-900"
-                    }`
+                    `relative cursor-pointer select-none py-3 pl-10 pr-4
+                    ${active ? "bg-indigo-500/20 text-white" : "text-gray-300"}
+                    transition-colors duration-150`
                   }
                   value={chain.chainType}
                 >
@@ -126,29 +164,34 @@ function ChainSelectorContent({
                         {React.createElement(
                           chainIcons[chain.chainType] || SiEthereum,
                           {
-                            className: `h-6 w-6 mr-2 ${
-                              active ? "text-indigo-600" : "text-gray-600"
+                            className: `h-6 w-6 mr-3 ${
+                              active ? "text-indigo-400" : "text-gray-400"
                             }`,
                           }
                         )}
-                        <span
-                          className={`block truncate ${
-                            selected ? "font-medium" : "font-normal"
-                          }`}
-                        >
-                          {chain.name}
-                        </span>
-                        <span className="ml-2 text-sm text-gray-500">
-                          ({chain.currencySymbol})
-                        </span>
+                        <div className="flex flex-col">
+                          <span
+                            className={`block ${
+                              selected ? "font-medium" : "font-normal"
+                            }`}
+                          >
+                            {chain.name}
+                          </span>
+                          <span className="text-sm text-gray-400">
+                            {chain.currencySymbol}
+                          </span>
+                        </div>
                       </span>
                       {selected && (
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-400">
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
                         </span>
                       )}
                       {chain.chainId && (
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-xs text-gray-400">
+                        <span
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 
+                          text-xs text-gray-500"
+                        >
                           Chain ID: {chain.chainId}
                         </span>
                       )}
@@ -161,84 +204,29 @@ function ChainSelectorContent({
         </div>
       </Listbox>
 
-      {isClient && selectedChainData?.blockExplorerUrl && (
-        <div className="mt-2 text-sm text-gray-500">
+      {/* 區塊鏈瀏覽器連結 */}
+      {selectedChain?.blockExplorerUrl && (
+        <div className="mt-2 text-sm">
           <a
-            href={selectedChainData.blockExplorerUrl}
+            href={selectedChain.blockExplorerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-indigo-600 hover:text-indigo-800"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors
+                     flex items-center space-x-1"
           >
-            {t("home.viewExplorer")}
+            <span>{t("home.viewExplorer")}</span>
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M10 6H6C4.89543 6 4 6.89543 4 8V18C4 19.1046 4.89543 20 6 20H16C17.1046 20 18 19.1046 18 18V14M14 4H20M20 4V10M20 4L10 14"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </a>
         </div>
       )}
     </div>
-  );
-}
-
-// Main Component
-export default function ChainSelector({
-  onChainChange,
-  value,
-  onChange,
-}: ChainSelectorProps) {
-  const { t } = useTranslation("common");
-  const { getChains } = useChainApi();
-  const [selectedChain, setSelectedChain] = useState<EChainType>(
-    EChainType.ETHEREUM
-  );
-
-  const {
-    data: chainsResponse,
-    isLoading,
-    error,
-  } = useQuery<ChainApiResponse>({
-    queryKey: ["chains"],
-    queryFn: getChains,
-    initialData: createFallbackResponse("初始化使用備用數據"),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const chains = useMemo(() => {
-    return chainsResponse.data
-      ? Object.values(chainsResponse.data).map((chainData) => ({
-          chainType: chainData.chainType as EChainType,
-          name: chainData.name,
-          currencySymbol: chainData.currencySymbol,
-          chainId: chainData.chainId,
-          blockExplorerUrl: chainData.blockExplorerUrl,
-          rpcUrl: chainData.rpcUrl,
-        }))
-      : fallbackChains; // 如果仍然為空，返回備用數據
-  }, [chainsResponse]);
-
-  const handleChainChange = (chain: EChainType) => {
-    setSelectedChain(chain);
-    onChainChange?.(chain);
-    onChange?.(chain);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="w-72">
-        <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    console.error("Error fetching chains:", error);
-    toast.error(`Failed to load chains"}`);
-    return <div>Error loading chains. Please try again.</div>;
-  }
-
-  return (
-    <ChainSelectorContent
-      selectedChain={selectedChain}
-      handleChainChange={handleChainChange}
-      chains={chains}
-      t={t}
-    />
   );
 }
