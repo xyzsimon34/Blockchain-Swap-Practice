@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { EChainType } from "@/constant/enum/chain.types";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 interface Token {
   address: string;
@@ -20,7 +21,6 @@ interface TokenSelectorProps {
   className?: string;
 }
 
-// 模擬代幣列表
 // 模擬代幣列表
 const mockTokens: Record<EChainType, Token[]> = {
   [EChainType.ETHEREUM]: [
@@ -106,63 +106,70 @@ const mockTokens: Record<EChainType, Token[]> = {
 };
 
 export default function TokenSelector({
-  label,
   value,
   onChange,
   chainType,
-  className = "w-full",
+  className = "",
 }: TokenSelectorProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const tokens = mockTokens[chainType] || [];
-
   return (
     <div className={className}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label}
-        </label>
-      )}
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="w-full flex items-center justify-between p-2 border rounded-lg"
+        className="flex items-center gap-2 px-3 py-2 bg-gray-700/50 hover:bg-gray-700 
+                     rounded-xl transition-colors"
       >
-        <span>{value?.symbol || t("token.select")}</span>
-        <span>▼</span>
+        {value?.logoURI && (
+          <img
+            src={value.logoURI}
+            alt={value.symbol}
+            className="w-6 h-6 rounded-full"
+          />
+        )}
+        <span className="font-medium">
+          {value?.symbol || t("token.select")}
+        </span>
+        <ChevronDownIcon className="w-4 h-4 text-gray-400" />
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black opacity-50"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative bg-white rounded-lg p-4 max-w-md w-full max-h-[80vh] overflow-auto">
+          <div className="relative bg-gray-900 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-auto">
             <h3 className="text-lg font-medium mb-4">{t("token.select")}</h3>
+
+            <input
+              type="text"
+              placeholder={t("token.search")}
+              className="w-full px-4 py-2 bg-gray-800 rounded-xl mb-4"
+            />
+
             <div className="space-y-2">
-              {tokens.map((token) => (
+              {mockTokens[chainType]?.map((token) => (
                 <button
                   key={token.address}
-                  className="w-full text-left p-2 hover:bg-gray-100 rounded-lg"
                   onClick={() => {
                     onChange(token);
                     setIsOpen(false);
                   }}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl"
                 >
-                  <div className="flex items-center">
-                    {token.logoURI && (
-                      <img
-                        src={token.logoURI}
-                        alt={token.symbol}
-                        className="w-6 h-6 mr-2 rounded-full"
-                      />
-                    )}
-                    <div>
-                      <div>{token.symbol}</div>
-                      <div className="text-sm text-gray-500">{token.name}</div>
-                    </div>
+                  {token.logoURI && (
+                    <img
+                      src={token.logoURI}
+                      alt={token.symbol}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <div className="text-left">
+                    <div className="font-medium">{token.symbol}</div>
+                    <div className="text-sm text-gray-400">{token.name}</div>
                   </div>
                 </button>
               ))}
