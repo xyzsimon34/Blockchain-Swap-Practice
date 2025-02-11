@@ -63,7 +63,7 @@ export default function SwapSettings({ className = "" }: SwapSettingsProps) {
             max="60"
             step="1"
           />
-          <span className="text-sm text-gray-400">分鐘</span>
+          <span className="text-sm text-gray-400">min</span>
         </div>
       </div>
     </div>
