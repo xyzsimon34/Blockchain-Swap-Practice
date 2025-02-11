@@ -1,5 +1,5 @@
 // src/services/price.service.ts
-import { Token, PriceInfo, PriceResponse } from "@/types/swap.types";
+import { Token, PriceInfo } from "@/types/swap.types";
 import { EChainType } from "@/constant/enum/chain.types";
 
 export class PriceService {
