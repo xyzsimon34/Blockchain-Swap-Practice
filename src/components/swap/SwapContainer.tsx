@@ -13,20 +13,17 @@ interface SwapContainerProps {
   className?: string;
 }
 
-// 添加 SwapDetails 類型定義
+interface Token {
+  address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  logoURI?: string;
+}
+
 interface SwapDetails {
-  fromToken: {
-    address: string;
-    symbol: string;
-    name: string;
-    decimals: number;
-  };
-  toToken: {
-    address: string;
-    symbol: string;
-    name: string;
-    decimals: number;
-  };
+  fromToken: Token;
+  toToken: Token;
   fromAmount: string;
   toAmount: string;
   exchangeRate: string;
@@ -72,27 +69,34 @@ export default function SwapContainer({ className }: SwapContainerProps) {
   };
 
   return (
-    <div className={`w-full max-w-xl mx-auto ${className}`}>
-      <div className="relative overflow-hidden rounded-2xl bg-gray-900/70 backdrop-blur-xl border border-white/10">
+    <div className="w-full mx-auto">
+      <div className="relative bg-[#1a1f2d] rounded-3xl p-6 border border-purple-500/20">
         <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
         {/* Header */}
-        <div className="relative p-4 flex justify-between items-center border-b border-white/10">
-          <h2 className="text-lg font-medium text-white">{t("swap.title")}</h2>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-          >
-            <Cog6ToothIcon className="h-5 w-5 text-white/70 hover:text-white/90" />
-          </button>
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold text-white">
+              {t("swap.title")}
+            </h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <Cog6ToothIcon className="h-5 w-5 text-white/70 hover:text-white/90" />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Content */}
         <div className="p-4 space-y-6">
           {/* Chain Selectors */}
           <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+            <div className="flex justify-between items-start gap-8">
+              {/* From Chain */}
+              <div className="flex-1 space-y-2 max-w-[240px]">
                 <label className="block text-sm font-medium text-white/70">
                   {t("swap.fromChain")}
                 </label>
@@ -102,7 +106,8 @@ export default function SwapContainer({ className }: SwapContainerProps) {
                   className="w-full"
                 />
               </div>
-              <div className="space-y-2">
+              {/* To Chain */}
+              <div className="flex-1 space-y-2 max-w-[240px]">
                 <label className="block text-sm font-medium text-white/70">
                   {t("swap.toChain")}
                 </label>
@@ -117,11 +122,14 @@ export default function SwapContainer({ className }: SwapContainerProps) {
             {/* Swap Direction Button */}
             <button
               onClick={handleSwapChains}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full
-                  bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30
-                  transition-all duration-200 hover:scale-110 group"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 
+               p-3 rounded-full
+               bg-[#2d2f3d] hover:bg-[#363847]
+               border border-[#4b6af5]/20 
+               transition-all duration-200 hover:scale-110 group
+               shadow-lg shadow-black/20"
             >
-              <ArrowsUpDownIcon className="h-4 w-4 text-indigo-400 group-hover:text-indigo-300" />
+              <ArrowsUpDownIcon className="h-5 w-5 text-[#4b6af5] group-hover:text-[#5d79ff]" />
             </button>
           </div>
 
