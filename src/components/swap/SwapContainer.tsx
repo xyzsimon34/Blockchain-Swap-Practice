@@ -8,28 +8,10 @@ import ChainSelector from "../ChainSelector";
 import { EChainType } from "@/constant/enum/chain.types";
 import { useTranslation } from "react-i18next";
 import { ArrowsUpDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { SwapDetails, Token } from "@/types/swap.types";
 
 interface SwapContainerProps {
   className?: string;
-}
-
-interface Token {
-  address: string;
-  symbol: string;
-  name: string;
-  decimals: number;
-  logoURI?: string;
-}
-
-interface SwapDetails {
-  fromToken: Token;
-  toToken: Token;
-  fromAmount: string;
-  toAmount: string;
-  exchangeRate: string;
-  priceImpact: string;
-  networkFee: string;
-  minimumReceived: string;
 }
 
 export default function SwapContainer({ className }: SwapContainerProps) {
@@ -48,12 +30,14 @@ export default function SwapContainer({ className }: SwapContainerProps) {
       symbol: "",
       name: "",
       decimals: 18,
+      chainId: EChainType.ETHEREUM, // 添加 chainId
     },
     toToken: {
       address: "",
       symbol: "",
       name: "",
       decimals: 18,
+      chainId: EChainType.BINANCE, // 添加 chainId
     },
     fromAmount: "0",
     toAmount: "0",
@@ -61,11 +45,42 @@ export default function SwapContainer({ className }: SwapContainerProps) {
     priceImpact: "0",
     networkFee: "0",
     minimumReceived: "0",
+    route: [], // 添加 route 屬性
   });
 
   const handleSwapChains = () => {
     setSourceChain(targetChain);
     setTargetChain(sourceChain);
+
+    // 更新 token 的 chainId
+    setSwapDetails((prev) => ({
+      ...prev,
+      fromToken: {
+        ...prev.fromToken,
+        chainId: targetChain,
+      },
+      toToken: {
+        ...prev.toToken,
+        chainId: sourceChain,
+      },
+    }));
+  };
+
+  const handleSwapDetailsChange = (newDetails: Partial<SwapDetails>) => {
+    setSwapDetails((prev) => ({
+      ...prev,
+      ...newDetails,
+      fromToken: {
+        ...prev.fromToken,
+        ...(newDetails.fromToken || {}),
+        chainId: sourceChain,
+      },
+      toToken: {
+        ...prev.toToken,
+        ...(newDetails.toToken || {}),
+        chainId: targetChain,
+      },
+    }));
   };
 
   return (
@@ -95,7 +110,6 @@ export default function SwapContainer({ className }: SwapContainerProps) {
           {/* Chain Selectors */}
           <div className="relative">
             <div className="flex justify-between items-start gap-8">
-              {/* From Chain */}
               <div className="flex-1 space-y-2 max-w-[240px]">
                 <label className="block text-sm font-medium text-white/70">
                   {t("swap.fromChain")}
@@ -106,7 +120,6 @@ export default function SwapContainer({ className }: SwapContainerProps) {
                   className="w-full"
                 />
               </div>
-              {/* To Chain */}
               <div className="flex-1 space-y-2 max-w-[240px]">
                 <label className="block text-sm font-medium text-white/70">
                   {t("swap.toChain")}
@@ -119,7 +132,6 @@ export default function SwapContainer({ className }: SwapContainerProps) {
               </div>
             </div>
 
-            {/* Swap Direction Button */}
             <button
               onClick={handleSwapChains}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 
@@ -138,7 +150,7 @@ export default function SwapContainer({ className }: SwapContainerProps) {
             sourceChain={sourceChain}
             targetChain={targetChain}
             onSwapClick={() => setShowConfirmation(true)}
-            onSwapDetailsChange={setSwapDetails}
+            onSwapDetailsChange={handleSwapDetailsChange}
           />
 
           {/* Settings Panel */}
@@ -155,7 +167,6 @@ export default function SwapContainer({ className }: SwapContainerProps) {
         isOpen={showConfirmation}
         onClose={() => setShowConfirmation(false)}
         onConfirm={() => {
-          // 實作交換邏輯
           setShowConfirmation(false);
         }}
         swapDetails={swapDetails}

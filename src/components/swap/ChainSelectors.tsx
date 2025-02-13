@@ -1,4 +1,3 @@
-// src/components/swap/ChainSelectors.tsx
 "use client";
 
 import { useState } from "react";

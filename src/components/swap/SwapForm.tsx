@@ -36,7 +36,7 @@ export default function SwapForm({
   // 使用 debounce 避免頻繁計算
   const debouncedCalculate = useCallback(
     debounce(async (amount: string) => {
-      if (!fromToken || !toToken || !amount || parseFloat(amount) <= 0) {
+      if (!fromToken || !toToken || !amount || parseFloat(amount) <= 0.001) {
         setToAmount("");
         setError(null);
         return;
@@ -80,13 +80,13 @@ export default function SwapForm({
       } finally {
         setIsCalculating(false);
       }
-    }, 500),
+    }, 1000),
     [fromToken, toToken, sourceChain, targetChain, onSwapDetailsChange, t]
   );
 
   // 當輸入值改變時觸發計算
   useEffect(() => {
-    if (fromAmount) {
+    if (fromAmount && parseFloat(fromAmount) >= 0.0001) {
       debouncedCalculate(fromAmount);
     } else {
       setToAmount("");
@@ -96,7 +96,7 @@ export default function SwapForm({
 
   const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+    if (value === "" || /^\d*\.?\d{0,6}$/.test(value)) {
       setFromAmount(value);
     }
   };
