@@ -148,9 +148,9 @@ export default function SwapForm({
         <button
           onClick={handleSwapTokens}
           className="p-2 rounded-full bg-indigo-500/20 hover:bg-indigo-500/30 
-                   transition-all duration-200 hover:scale-105 group"
+            transition-all duration-200 hover:scale-105 group"
         >
-          <ArrowsUpDownIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300" />
+          <ArrowsUpDownIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 group-hover:rotate-180 transition-transform duration-200" />
         </button>
       </div>
 

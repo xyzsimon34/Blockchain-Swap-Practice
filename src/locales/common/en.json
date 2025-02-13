@@ -59,7 +59,10 @@
     "gasFee": "Gas Fee",
     "total": "Total",
     "priceUpdated": "Price updated",
-    "transactionDetails": "Transaction Details"
+    "transactionDetails": "Transaction Details",
+    "history": "Transaction History",
+    "historyTitle": "Transaction History",
+    "noHistory": "No transaction history"
   },
   "token": {
     "select": "Select Token",
