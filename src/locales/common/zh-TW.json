@@ -59,7 +59,10 @@
     "gasFee": "礦工費",
     "total": "總計",
     "priceUpdated": "價格已更新",
-    "transactionDetails": "交易詳情"
+    "transactionDetails": "交易詳情",
+    "history": "交易歷史",
+    "historyTitle": "交易歷史",
+    "noHistory": "暫無交易記錄"
   },
   "token": {
     "select": "選擇代幣",

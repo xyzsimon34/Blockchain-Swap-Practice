@@ -66,21 +66,33 @@ export default function ChainSelector({
     queryKey: ["chains"],
     queryFn: getChains,
     initialData: createFallbackResponse("初始化使用備用數據"),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 300000,
   });
 
   // 處理鏈數據
-  const chains = useMemo(() => {
-    if (!chainsResponse.data) return [];
-    return Object.values(chainsResponse.data).map((chainData) => ({
-      chainType: chainData.chainType as EChainType,
-      name: chainData.name,
-      currencySymbol: chainData.currencySymbol,
-      chainId: chainData.chainId,
-      blockExplorerUrl: chainData.blockExplorerUrl,
-      rpcUrl: chainData.rpcUrl,
-    }));
-  }, [chainsResponse.data]);
+  const chains = useMemo(
+    () =>
+      chainsResponse.data
+        ? Object.values(chainsResponse.data).map(
+            ({
+              chainType,
+              name,
+              currencySymbol,
+              chainId,
+              blockExplorerUrl,
+              rpcUrl,
+            }) => ({
+              chainType: chainType as EChainType,
+              name,
+              currencySymbol,
+              chainId,
+              blockExplorerUrl,
+              rpcUrl,
+            })
+          )
+        : [],
+    [chainsResponse.data]
+  );
 
   // 加載狀態
   if (isLoading) {
@@ -100,105 +112,84 @@ export default function ChainSelector({
 
   // 獲取當前選中的鏈數據
   const selectedChain = chains.find((chain) => chain.chainType === value);
+  const SelectedIcon = chainIcons[value] || SiEthereum;
 
   return (
     <div className={className}>
       <Listbox value={value} onChange={onChainChange} disabled={disabled}>
         <div className="relative">
           {/* 選擇器按鈕 */}
-          <ListboxButton
-            className="relative w-full cursor-pointer rounded-xl 
-            bg-gray-800/50 py-3 pl-4 pr-10 group
-            text-left border border-white/10 
-            hover:border-indigo-500/50 hover:bg-gray-800/70
-            focus:outline-none focus-visible:border-indigo-500 
-            focus-visible:ring-2 focus-visible:ring-white/75 
-            transition-all duration-200
-            disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span className="flex items-center">
-              {React.createElement(chainIcons[value] || SiEthereum, {
-                className:
-                  "h-6 w-6 mr-3 text-white/70 group-hover:text-indigo-400 transition-colors",
-              })}
-              <div className="flex flex-col">
-                <span className="block text-white font-medium">
-                  {selectedChain?.name}
+          <ListboxButton className="relative w-auto h-16 cursor-pointer rounded-xl bg-gray-800/50 py-3 pl-4 pr-10 text-left border border-white/10 hover:border-indigo-500/50 hover:bg-gray-800/70 focus:outline-none transition-all duration-200 disabled:opacity-50 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg">
+            <div className="grid grid-cols-[auto,1fr,auto] items-center h-full gap-3">
+              {/* Icon with hover effect */}
+              <SelectedIcon className="h-6 w-6 text-white/70 flex-shrink-0 transition-transform duration-200 hover:scale-110" />
+
+              {/* Text Content */}
+              <div className="flex flex-col justify-center min-w-0">
+                {/* Chain Name */}
+                <span className="text-white font-medium truncate">
+                  {selectedChain?.name || t("common.selectChain")}
                 </span>
-                <span className="text-sm text-white/50">
+
+                {/* Currency Symbol */}
+                <span className="text-sm text-white/50 truncate">
                   {selectedChain?.currencySymbol}
                 </span>
               </div>
-            </span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <ChevronUpDownIcon className="h-5 w-5 text-white/50 group-hover:text-indigo-400 transition-colors" />
-            </span>
+
+              {/* Chevron Icon with rotation effect */}
+              <ChevronUpDownIcon className="h-5 w-5 text-white/50 flex-shrink-0 transition-transform duration-200 hover:rotate-180" />
+            </div>
           </ListboxButton>
 
-          {/* 下拉選項 */}
+          {/* 下拉選單 */}
           <Transition
             as={Fragment}
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <ListboxOptions
-              className="absolute z-[100] w-full mt-2 max-h-60 overflow-auto 
-              rounded-xl bg-gray-900/95 backdrop-blur-sm py-2 
-              text-base shadow-lg ring-1 ring-black/5 focus:outline-none
-              border border-white/10"
-            >
-              {chains.map((chain) => (
-                <ListboxOption
-                  key={chain.chainType}
-                  className={({ active }) =>
-                    `relative cursor-pointer select-none py-3 pl-10 pr-4
-                    ${active ? "bg-indigo-500/20 text-white" : "text-gray-300"}
-                    transition-colors duration-150`
-                  }
-                  value={chain.chainType}
-                >
-                  {({ selected, active }) => (
-                    <>
-                      <span className="flex items-center">
-                        {React.createElement(
-                          chainIcons[chain.chainType] || SiEthereum,
-                          {
-                            className: `h-6 w-6 mr-3 ${
-                              active ? "text-indigo-400" : "text-gray-400"
-                            }`,
-                          }
-                        )}
-                        <div className="flex flex-col">
+            <ListboxOptions className="absolute z-10 w-full mt-2 max-h-60 overflow-auto bg-gray-900/95 backdrop-blur-sm py-2 text-base shadow-lg ring-1 ring-black/5 border border-white/10 rounded-xl">
+              {chains.map((chain) => {
+                const Icon = chainIcons[chain.chainType] || SiEthereum;
+                return (
+                  <ListboxOption
+                    key={chain.chainId || chain.chainType}
+                    value={chain.chainType}
+                    className={({ active }) =>
+                      `cursor-pointer select-none py-3 pl-10 pr-4 ${
+                        active ? "bg-indigo-500/20 text-white" : "text-gray-300"
+                      }`
+                    }
+                  >
+                    {({ selected }) => (
+                      <div className="flex items-center">
+                        <Icon className="h-6 w-6 mr-3 text-gray-400" />
+                        <div>
                           <span
-                            className={`block ${
+                            className={`${
                               selected ? "font-medium" : "font-normal"
                             }`}
                           >
                             {chain.name}
                           </span>
-                          <span className="text-sm text-gray-400">
+                          <span className="text-sm text-gray-400 block">
                             {chain.currencySymbol}
                           </span>
                         </div>
-                      </span>
-                      {selected && (
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-400">
-                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                        </span>
-                      )}
-                      {chain.chainId && (
-                        <span
-                          className="absolute inset-y-0 right-0 flex items-center pr-3 
-                          text-xs text-gray-500"
-                        >
-                          Chain ID: {chain.chainId}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </ListboxOption>
-              ))}
+                        {selected && (
+                          <CheckIcon className="absolute left-3 h-5 w-5 text-indigo-400" />
+                        )}
+                        {chain.chainId && (
+                          <span className="absolute right-3 text-xs text-gray-500">
+                            Chain ID: {chain.chainId}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </ListboxOption>
+                );
+              })}
             </ListboxOptions>
           </Transition>
         </div>
@@ -211,8 +202,7 @@ export default function ChainSelector({
             href={selectedChain.blockExplorerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-indigo-400 hover:text-indigo-300 transition-colors
-                     flex items-center space-x-1"
+            className="text-indigo-400 hover:text-indigo-300 flex items-center space-x-1"
           >
             <span>{t("home.viewExplorer")}</span>
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
