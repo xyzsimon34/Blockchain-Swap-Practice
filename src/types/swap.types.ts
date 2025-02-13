@@ -1,10 +1,12 @@
-// src/types/swap.types.ts
+import { EChainType } from "@/constant/enum/chain.types";
+
 export interface Token {
   address: string;
   symbol: string;
   name: string;
   decimals: number;
   logoURI?: string;
+  chainId: EChainType;
 }
 
 export interface PriceInfo {
@@ -13,6 +15,18 @@ export interface PriceInfo {
   minimumReceived: string;
   networkFee: string;
   route?: string[];
+}
+
+export interface SwapDetails {
+  fromToken: Token;
+  toToken: Token;
+  fromAmount: string;
+  toAmount: string;
+  exchangeRate: string;
+  priceImpact: string;
+  networkFee: string;
+  minimumReceived: string;
+  route: string[];
 }
 
 export interface SwapQuote {

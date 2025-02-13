@@ -26,12 +26,14 @@ const mockTokens: Record<EChainType, Token[]> = {
       symbol: "ETH",
       name: "Ethereum",
       decimals: 18,
+      chainId: EChainType.ETHEREUM, // 添加 chainId
     },
     {
       address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
       symbol: "USDT",
       name: "Tether USD",
       decimals: 6,
+      chainId: EChainType.ETHEREUM,
     },
   ],
   [EChainType.BINANCE]: [
@@ -40,26 +42,14 @@ const mockTokens: Record<EChainType, Token[]> = {
       symbol: "BNB",
       name: "Binance Coin",
       decimals: 18,
+      chainId: EChainType.BINANCE,
     },
     {
       address: "0x55d398326f99059ff775485246999027b3197955",
       symbol: "USDT",
       name: "Tether USD",
       decimals: 18,
-    },
-  ],
-  [EChainType.TRON]: [
-    {
-      address: "0x0000000000000000000000000000000000000000",
-      symbol: "TRX",
-      name: "TRON",
-      decimals: 6,
-    },
-    {
-      address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-      symbol: "USDT",
-      name: "Tether USD",
-      decimals: 6,
+      chainId: EChainType.BINANCE,
     },
   ],
   [EChainType.POLYGON]: [
@@ -68,12 +58,30 @@ const mockTokens: Record<EChainType, Token[]> = {
       symbol: "MATIC",
       name: "Polygon",
       decimals: 18,
+      chainId: EChainType.POLYGON,
     },
     {
       address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
       symbol: "USDT",
       name: "Tether USD",
       decimals: 6,
+      chainId: EChainType.POLYGON,
+    },
+  ],
+  [EChainType.TRON]: [
+    {
+      address: "0x0000000000000000000000000000000000000000",
+      symbol: "TRX",
+      name: "TRON",
+      decimals: 6,
+      chainId: EChainType.TRON,
+    },
+    {
+      address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+      symbol: "USDT",
+      name: "Tether USD",
+      decimals: 6,
+      chainId: EChainType.TRON,
     },
   ],
   [EChainType.POLYGON_ZKEVM]: [
@@ -82,12 +90,14 @@ const mockTokens: Record<EChainType, Token[]> = {
       symbol: "ETH",
       name: "Ethereum",
       decimals: 18,
+      chainId: EChainType.POLYGON_ZKEVM,
     },
     {
       address: "0x1E4a5963aBFD975d8c9021ce480b42188849D41d",
       symbol: "USDT",
       name: "Tether USD",
       decimals: 6,
+      chainId: EChainType.POLYGON_ZKEVM,
     },
   ],
 };
