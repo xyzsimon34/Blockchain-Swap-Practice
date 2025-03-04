@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import { WalletConnect } from "@/components/WalletConnect";
 import SwapContainer from "@/components/swap/SwapContainer";
+import Link from "next/link";
 
 function HomeContent() {
   const { t } = useTranslation("common");
